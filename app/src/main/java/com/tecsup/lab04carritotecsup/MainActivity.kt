@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -161,32 +162,107 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Lista de productos
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(productos) { producto ->
-                    TarjetaProducto(
-                        producto = producto,
+            val subtotal = productos.sumOf { it.precio * it.cantidad }
+            val igv = subtotal * 0.18
+            val total = subtotal + igv
 
-                        // Evento de eliminación
-                        onEliminar = {
-                            productos.remove(producto)
-                        }
+            if (productos.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                Column() {
+                    Text("Tu carrito esta vacio")
+                    Text("Agrega tu primer producto")
+                }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(productos) { producto ->
+                        TarjetaProducto(
+                            producto = producto,
+
+                            onEliminar = {
+                                productos.remove(producto)
+                            }
+                        )
+                    }
+                }
+            }
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Subtotal"
+                        )
+
+                        Text(
+                            text = "S/ %.2f".format(subtotal)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "IGV (18%)"
+                        )
+
+                        Text(
+                            text = "S/ %.2f".format(igv)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "TOTAL",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Text(
+                            text = "S/ %.2f".format(total),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+
+                    Text(
+                        text = "Productos: ${productos.size}",
+                        color = MaterialTheme.colorScheme.outline
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Desarrollado por Clemente",
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }
@@ -213,28 +289,28 @@ fun TarjetaProducto(
                 modifier = Modifier.weight(1f)
             ) {
 
-                // Nombre del producto
+
                 Text(
                     text = producto.nombre,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
-                // Precio x cantidad
+
                 Text(
                     text = "S/ ${producto.precio} x ${producto.cantidad}",
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            // Importe total
+
             Text(
                 text = "Importe: S/ ${
                     "%.2f".format(producto.precio * producto.cantidad)
                 }"
             )
 
-            // Botón eliminar
+
             IconButton(
                 onClick = onEliminar
             ) {
