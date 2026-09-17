@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +17,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -42,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.tecsup.lab04carritotecsup.ui.theme.Lab04CarritoTecsupTheme
 
 
@@ -67,16 +71,20 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
         mutableStateListOf<Producto>()
     }
 
+    val subtotal = productos.sumOf { it.precio * it.cantidad }
+    val igv = subtotal * 0.18
+    val total = subtotal + igv
+
     Scaffold(
         topBar = {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp),
-                color = Color(0xFF52638F)
+                color = Color(0xFF7A2AB0)
             ) {
                 Text(
-                    text = "Registro de Producto",
+                    text = "MI Carrito TECSUP",
                     modifier = Modifier
                         .padding(16.dp)
                         .padding(top = 20.dp),
@@ -84,7 +92,98 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.titleLarge
                 )
             }
+        },
+
+        bottomBar = {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.medium
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+
+                    Text(
+                        text = "Productos: ${productos.size}",
+                        color = MaterialTheme.colorScheme.outline
+                    )
+
+
+                    if (productos.isNotEmpty()) {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Subtotal",
+                                color = Color(0, 0, 0, 200)
+                            )
+
+                            Text(
+                                text = "S/ %.2f".format(subtotal),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.width(150.dp),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "IGV (18%)",
+                                color = Color(0, 0, 0, 200)
+                            )
+
+                            Text(
+                                text = "S/ %.2f".format(igv),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.width(150.dp),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "TOTAL",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+
+                        Text(
+                            text = "S/ %.2f".format(total),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(123, 50, 147, 255),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.width(150.dp),
+
+                        )
+                    }
+                }
+
+            }
         }
+
+
     ) { innerPadding ->
 
         Column(
@@ -94,16 +193,6 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
                 .padding(innerPadding)
         ) {
 
-            Text(
-                text = "Nuevo producto",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = "Completa los datos y presiona Agregar",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.outline
-            )
-            Spacer(modifier = Modifier.height(24.dp))
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
@@ -149,31 +238,39 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
                         cantidad = ""
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF7A2AB0),
+                )
+
+
             ) {
                 Text("AGREGAR")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Productos: ${productos.size}"
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            val subtotal = productos.sumOf { it.precio * it.cantidad }
-            val igv = subtotal * 0.18
-            val total = subtotal + igv
-
             if (productos.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                Column() {
-                    Text("Tu carrito esta vacio")
-                    Text("Agrega tu primer producto")
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Tu carrito esta vacio",
+                        color = Color(0, 0, 0, 200),
+                        fontSize = 22.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+
+                    )
+                    Text(text = "Agrega tu primer producto",
+                        color= Color(0,0,0,100),
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth())
+
                 }
                 }
             } else {
@@ -194,75 +291,6 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
                     }
                 }
             }
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Subtotal"
-                        )
-
-                        Text(
-                            text = "S/ %.2f".format(subtotal)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "IGV (18%)"
-                        )
-
-                        Text(
-                            text = "S/ %.2f".format(igv)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "TOTAL",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-
-                        Text(
-                            text = "S/ %.2f".format(total),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-
-                    Text(
-                        text = "Productos: ${productos.size}",
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
-            }
         }
     }
 }
@@ -275,7 +303,15 @@ fun TarjetaProducto(
 ) {
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().height(90.dp),
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(
+            2.dp,
+            Color(0xFFD0CCF0)
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
 
         Row(
@@ -288,15 +324,13 @@ fun TarjetaProducto(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-
-
                 Text(
                     text = producto.nombre,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
                 )
-
-
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = "S/ ${producto.precio} x ${producto.cantidad}",
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -305,9 +339,9 @@ fun TarjetaProducto(
 
 
             Text(
-                text = "Importe: S/ ${
-                    "%.2f".format(producto.precio * producto.cantidad)
-                }"
+                text = " S/. ${"%.2f".format(producto.precio * producto.cantidad)}",
+                color = Color(123, 50, 147, 255)
+
             )
 
 
