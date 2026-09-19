@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -32,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -70,6 +72,8 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
     val productos = remember {
         mutableStateListOf<Producto>()
     }
+
+    var productoAEliminar by remember { mutableStateOf<Producto?>(null) }
 
     val subtotal = productos.sumOf { it.precio * it.cantidad }
     val igv = subtotal * 0.18
@@ -285,13 +289,42 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
                             producto = producto,
 
                             onEliminar = {
-                                productos.remove(producto)
+                                productoAEliminar = producto
                             }
                         )
                     }
                 }
             }
         }
+    }
+
+    productoAEliminar?.let { producto ->
+        AlertDialog(
+            onDismissRequest = { productoAEliminar = null },
+            title = {
+                Text("Eliminar producto")
+            },
+            text = {
+                Text("¿Eliminar este producto?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        productos.remove(producto)
+                        productoAEliminar = null
+                    }
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { productoAEliminar = null }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
 
