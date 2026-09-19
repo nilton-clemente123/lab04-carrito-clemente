@@ -79,6 +79,14 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
     val igv = subtotal * 0.18
     val total = subtotal + igv
 
+    val porcentajeDescuento = when {
+        total > 5000 -> 0.10
+        total > 3000 -> 0.05
+        else -> 0.0
+    }
+    val montoDescuento = total * porcentajeDescuento
+    val totalFinal = total - montoDescuento
+
     Scaffold(
         topBar = {
             Surface(
@@ -157,7 +165,25 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        if (porcentajeDescuento > 0) {
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Descuento Aplicado (${"%.0f".format(porcentajeDescuento * 100)}%)"
+                                )
+
+                                Text(
+                                    text = "-S/ %.2f".format(montoDescuento),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.width(150.dp),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     }
 
 
@@ -173,7 +199,7 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
                         )
 
                         Text(
-                            text = "S/ %.2f".format(total),
+                            text = "S/ %.2f".format(totalFinal),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = Color(123, 50, 147, 255),
@@ -182,6 +208,7 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
 
                         )
                     }
+
                 }
 
             }
@@ -326,6 +353,9 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
             }
         )
     }
+
+
+
 }
 
 
